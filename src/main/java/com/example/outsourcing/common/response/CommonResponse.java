@@ -1,8 +1,7 @@
 package com.example.outsourcing.common.response;
 
-import org.springframework.http.HttpStatus;
-
 import com.example.outsourcing.common.Exception.BaseCode;
+import org.springframework.http.HttpStatus;
 
 import lombok.Getter;
 
