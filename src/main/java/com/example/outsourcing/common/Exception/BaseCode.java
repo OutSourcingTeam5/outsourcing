@@ -1,4 +1,4 @@
-package com.example.outsourcing.Common.Exception;
+package com.example.outsourcing.common.Exception;
 
 import org.springframework.http.HttpStatus;
 
