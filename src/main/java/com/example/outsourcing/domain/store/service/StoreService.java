@@ -4,7 +4,7 @@ package com.example.outsourcing.domain.store.service;
 import com.example.outsourcing.domain.store.dto.request.StoreRequestDto;
 import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
-import com.example.outsourcing.domain.store.repository.UserRepository;
+import com.example.outsourcing.domain.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,16 +1,15 @@
 package com.example.outsourcing.domain.auth.repository;
 
-import java.util.Optional;
-
+import com.example.outsourcing.domain.auth.entity.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.outsourcing.domain.auth.entity.RefreshToken;
+import java.util.Optional;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
 	Optional<RefreshToken> findByUserId(Long userId);
 
-	Optional<RefreshToken> findRefreshToken(String refreshToken);
+	Optional<RefreshToken> findByRefreshToken(String refreshToken);
 
 	void deleteByUserId(Long userId);
 }
