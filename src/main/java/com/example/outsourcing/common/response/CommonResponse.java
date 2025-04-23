@@ -2,7 +2,7 @@ package com.example.outsourcing.common.response;
 
 import org.springframework.http.HttpStatus;
 
-import com.example.outsourcing.common.Exception.BaseCode;
+import com.example.outsourcing.common.exception.BaseCode;
 
 import lombok.Getter;
 
@@ -26,6 +26,8 @@ public class CommonResponse<T> {
 
 	public static <T> CommonResponse<T> of(BaseCode code) {
 		return of(code, null);
-	}{
+	}
+
+	{
 	}
 }
