@@ -1,33 +1,96 @@
 package com.example.outsourcing.common.response;
 
-import org.springframework.http.HttpStatus;
-
 import com.example.outsourcing.common.exception.BaseCode;
+import com.example.outsourcing.common.exception.SuccessCode;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
+import org.springframework.http.HttpStatus;
 
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Getter
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommonResponse<T> {
 
-	private final HttpStatus httpStatus;
+	@Builder.Default
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+	private final LocalDateTime timestamp = LocalDateTime.now();
+	private final boolean isError;
+	private final HttpStatus status;
+	private final String code;
 	private final String message;
-	//    @JsonInclude(JsonInclude.Include.NON_NULL)
 	private final T data;
+	private final ErrorResponse errorResponse;
 
-	private CommonResponse(HttpStatus httpStatus, String message, T data) {
-		this.httpStatus = httpStatus;
-		this.message = message;
-		this.data = data;
+
+	public static <T> CommonResponse<T> ok() {
+		return CommonResponse.<T>builder()
+				.timestamp(LocalDateTime.now())
+				.isError(false)
+				.status(SuccessCode.OK.getHttpStatus())
+				.code(SuccessCode.OK.getCode())
+				.message(SuccessCode.OK.getMessage())
+				.data(null)
+				.errorResponse(null)
+				.build();
 	}
 
-	public static <T> CommonResponse<T> of(BaseCode code, T data) {
-		return new CommonResponse<>(code.getStatus(), code.getMessage(), data);
+
+	public static <T> CommonResponse<T> ok(T data) {
+		return CommonResponse.<T>builder()
+				.timestamp(LocalDateTime.now())
+				.isError(false)
+				.status(SuccessCode.OK.getHttpStatus())
+				.code(SuccessCode.OK.getCode())
+				.message(SuccessCode.OK.getMessage())
+				.data(data)
+				.errorResponse(null)
+				.build();
 	}
 
-	public static <T> CommonResponse<T> of(BaseCode code) {
-		return of(code, null);
+
+	public static <T> CommonResponse<T> created(T data) {
+		return CommonResponse.<T>builder()
+				.timestamp(LocalDateTime.now())
+				.isError(false)
+				.status(SuccessCode.CREATED.getHttpStatus())
+				.code(SuccessCode.CREATED.getCode())
+				.message(SuccessCode.CREATED.getMessage())
+				.data(data)
+				.errorResponse(null)
+				.build();
 	}
 
-	{
+
+	public static CommonResponse<Void> error(BaseCode baseCode) {
+		return CommonResponse.<Void>builder()
+				.timestamp(LocalDateTime.now())
+				.isError(true)
+				.status(baseCode.getHttpStatus())
+				.code(baseCode.getCode())
+				.message(baseCode.getMessage())
+				.data(null)
+				.errorResponse(null)
+				.build();
 	}
+
+	public static CommonResponse<Void> error(BaseCode baseCode, List<ErrorResponse.FieldError> fieldErrors) {
+		return CommonResponse.<Void>builder()
+				.timestamp(LocalDateTime.now())
+				.isError(true)
+				.status(baseCode.getHttpStatus())
+				.code(baseCode.getCode())
+				.message(baseCode.getMessage())
+				.data(null)
+				.errorResponse(ErrorResponse.of(baseCode, fieldErrors))
+				.build();
+	}
+
+
+
 }
