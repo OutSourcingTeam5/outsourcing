@@ -1,4 +1,4 @@
-package com.example.outsourcing.common.Entity;
+package com.example.outsourcing.common.entity;
 
 import java.time.LocalDateTime;
 
