@@ -1,5 +1,7 @@
 package com.example.outsourcing.domain.order.entity;
 
+import com.example.outsourcing.common.entity.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,14 +13,14 @@ import lombok.Getter;
 @Getter
 @Entity
 @Table(name = "orders")
-public class Order {
+public class Order extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(nullable = false)
-	private String orderStatus;
+	private OrderStatus orderStatus;
 
 	@Column(nullable = false)
 	private Long userId;
@@ -33,10 +35,10 @@ public class Order {
 
 	}
 
-	public Order(String orderStatus, Long userId, Long menuId, Long storeId) {
+	public Order(OrderStatus orderStatus, Long userId, Long storeId, Long menuId) {
 		this.orderStatus = orderStatus;
 		this.userId = userId;
-		this.menuId = menuId;
 		this.storeId = storeId;
+		this.menuId = menuId;
 	}
 }
