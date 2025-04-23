@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -52,5 +53,24 @@ public class User extends BaseEntity {
 
 	@Column(length = 100, unique = true)
 	private String providerId;
+
+	@Builder
+	public User(String email, String password, String name, Role role, String provider, String providerId) {
+		this.email = email;
+		this.password = password;
+		this.name = name;
+		this.role = role;
+		this.provider = provider;
+		this.providerId = providerId;
+	}
+
+	public void delete() {
+		this.isDeleted = true;
+		this.deletedAt = LocalDateTime.now();
+	}
+
+	public void updateName(String name) {
+		this.name = name;
+	}
 
 }
