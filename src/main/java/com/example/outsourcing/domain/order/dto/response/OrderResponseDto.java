@@ -17,7 +17,7 @@ public class OrderResponseDto {
 	private final OrderStatus orderStatus;
 
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime createdAt;
+	private final LocalDateTime createdAt;
 
 	public OrderResponseDto(
 		Long id,
