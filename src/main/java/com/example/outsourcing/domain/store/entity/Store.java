@@ -1,4 +1,4 @@
-package com.example.outsourcing.domain.Store.entity;
+package com.example.outsourcing.domain.store.entity;
 
 
 import java.time.LocalTime;

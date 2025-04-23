@@ -1,16 +1,13 @@
-package com.example.outsourcing.domain.Store.dto.response;
+package com.example.outsourcing.domain.store.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalTime;
 
 @Getter
-@RequiredArgsConstructor
-public class storeSaveResponseDto {
-
-    private final Long id;
+@AllArgsConstructor
+public class StoreRequestDto {
 
     private final String name;
 
@@ -19,8 +16,6 @@ public class storeSaveResponseDto {
     private final LocalTime closeTime;
 
     private final Integer minOrderPrice;
-
-    private final String status;
 
     private final String category;
 
