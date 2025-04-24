@@ -41,18 +41,20 @@ public class StoreController {
 
 	@GetMapping("/{storeId}")
 	public CommonResponse<StoreSingleResponseDto> findSingleStore(
+		@RequestAttribute("userId") Long userId,
 		@PathVariable("storeId") Long storeId) {
 
 		return CommonResponse.ok(storeService.findSingleStore(storeId));
 	}
 
 	@GetMapping
-	public CommonResponse<SliceResponseDto<StoreResponseDto>> findAllStore(
-		@RequestParam(defaultValue = "1") int page, @RequestParam(required = false) String nameSearch) {
+	public CommonResponse<SliceResponseDto<StoreResponseDto>> findAllStore(@RequestAttribute("userId") Long userId,
+		@RequestParam(value = "page", defaultValue = "1") int page,
+		@RequestParam(required = false) String nameSearch) {
 
 		SliceResponseDto<StoreResponseDto> sliceResponseDto = storeService.findAllStore(page, nameSearch);
 
-		return null;
+		return CommonResponse.ok(sliceResponseDto);
 	}
 
 	@PatchMapping("/{storeId}")

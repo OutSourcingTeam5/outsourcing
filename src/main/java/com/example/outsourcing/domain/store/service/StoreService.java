@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -138,8 +139,17 @@ public class StoreService {
 
 		// Slice<StoreResponseDto> allStore = storeRepository.findAllStore(pageable, nameSearch);
 
-		storeRepository.findAllstores(nameSearch, pageable);
+		Slice<Store> allstores = storeRepository.findAllstores(nameSearch, pageable);
 
-		return null;
+		List<StoreResponseDto> storeDtoList = allstores.stream()
+			.map(store -> new StoreResponseDto(store.getName(), store.getMinOrderPrice()))
+			.toList();
+
+		return new SliceResponseDto<>(
+			storeDtoList,
+			allstores.getNumber(),
+			allstores.getSize(),
+			allstores.isFirst(),
+			allstores.isLast());
 	}
 }
