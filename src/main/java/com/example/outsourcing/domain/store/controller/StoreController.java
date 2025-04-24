@@ -14,6 +14,7 @@ import com.example.outsourcing.domain.store.dto.request.StoreRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreUpdateResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreWithdrawResponseDto;
 import com.example.outsourcing.domain.store.service.StoreService;
 
 import jakarta.validation.Valid;
@@ -41,12 +42,10 @@ public class StoreController {
 	}
 
 	@DeleteMapping("{storeId}")
-	public CommonResponse<Void> deleteStore(@RequestAttribute("userId") Long userId,
+	public CommonResponse<StoreWithdrawResponseDto> deleteStore(@RequestAttribute("userId") Long userId,
 		@PathVariable("storeId") Long storeId) {
 
-		storeservice.delete(userId, storeId);
-
-		return CommonResponse.ok();
+		return CommonResponse.ok(storeservice.delete(userId, storeId));
 	}
 
 }

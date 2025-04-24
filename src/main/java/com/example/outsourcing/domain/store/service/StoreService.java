@@ -7,6 +7,7 @@ import com.example.outsourcing.domain.store.dto.request.StoreRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreUpdateResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreWithdrawResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.Category;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
@@ -72,7 +73,7 @@ public class StoreService {
 	}
 
 	@Transactional
-	public void delete(Long userId, Long storeId) {
+	public StoreWithdrawResponseDto delete(Long userId, Long storeId) {
 
 		User user = checkOwnerOrThrow(userId);
 
@@ -82,6 +83,9 @@ public class StoreService {
 		checkOwnerForStore(user, store);
 
 		store.updateStoreStatus(StoreStatus.CLOSED);
+
+		return new StoreWithdrawResponseDto(store,
+			"가게 폐업 처리 되었습니다.");
 	}
 
 	private User checkOwnerOrThrow(Long userId) {
