@@ -18,7 +18,7 @@ public enum ErrorCode implements BaseCode {
 	// 메뉴 도메인 에러코드 (추가)
 	MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "M001", "해당 메뉴가 존재하지 않습니다."),
 	STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "해당 가게가 존재하지 않습니다."),
-	FORBIDDEN(HttpStatus.FORBIDDEN, "C006", "권한이 없습니다."),
+	FORBIDDEN(HttpStatus.FORBIDDEN, "C006", "권한이 없습니다.."),
 	ALREADY_DELETED_MENU(HttpStatus.CONFLICT, "M002", "이미 삭제된 메뉴입니다.");
 
 	private final HttpStatus httpStatus;
