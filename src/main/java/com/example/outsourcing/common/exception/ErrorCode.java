@@ -21,7 +21,7 @@ public enum ErrorCode implements BaseCode {
 	FORBIDDEN(HttpStatus.FORBIDDEN, "C006", "권한이 없습니다.."),
 	ALREADY_DELETED_MENU(HttpStatus.CONFLICT, "M002", "이미 삭제된 메뉴입니다.");
 
-	private final HttpStatus httpStatus;
-	private final String code;
-	private final String message;
+    private final HttpStatus httpStatus;
+    private final String code;
+    private final String message;
 }
