@@ -2,10 +2,15 @@ package com.example.outsourcing.domain.store.entity;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-import com.example.outsourcing.domain.store.dto.request.StoreRequestDto;
+import com.example.outsourcing.domain.menu.entity.Menu;
+import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.enums.Category;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.user.entity.User;
@@ -20,6 +25,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 
@@ -57,6 +63,10 @@ public class Store {
 	@JoinColumn(name = "user_id")
 	private User user;
 
+	@OneToMany(mappedBy = "store")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private List<Menu> menus = new ArrayList<>();
+
 	public Store() {
 
 	}
@@ -72,7 +82,7 @@ public class Store {
 		this.user = user;
 	}
 
-	public void update(StoreRequestDto dto) {
+	public void update(StoreUpdateRequestDto dto) {
 		if (dto.getName() != null) {
 			this.name = dto.getName();
 		}
@@ -91,7 +101,7 @@ public class Store {
 		}
 	}
 
-	public void updateStoreStatus(StoreStatus storeStatus) {
+	public void delete(StoreStatus storeStatus) {
 		this.storeStatus = storeStatus;
 	}
 

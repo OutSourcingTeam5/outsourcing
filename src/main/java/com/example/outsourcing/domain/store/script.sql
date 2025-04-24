@@ -41,3 +41,16 @@ VALUES (NOW(),
         'kakao',
         'kakao_user_001',
         'USER');
+
+
+INSERT INTO menu (name, description, price, status, store_id)
+VALUES ('치킨마요덮밥', '담백한 치킨마요 덮밥', 6500, 'ACTIVE', 5);
+
+INSERT INTO menu (name, description, price, status, store_id)
+VALUES ('돈까스정식', '바삭한 돈까스와 밥, 국 포함', 8500, 'ACTIVE', 5);
+
+INSERT INTO menu (name, description, price, status, store_id)
+VALUES ('오므라이스', '케첩소스 듬뿍 오므라이스', 7000, 'ACTIVE', 5);
+
+INSERT INTO menu (name, description, price, status, store_id)
+VALUES ('떡볶이', '매콤달콤 국물떡볶이', 5000, 'ACTIVE', 5);
