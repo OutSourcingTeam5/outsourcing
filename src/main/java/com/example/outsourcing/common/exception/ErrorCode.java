@@ -1,8 +1,9 @@
 package com.example.outsourcing.common.exception;
 
+import org.springframework.http.HttpStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
@@ -19,7 +20,6 @@ public enum ErrorCode implements BaseCode {
 	STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "해당 가게가 존재하지 않습니다."),
 	FORBIDDEN(HttpStatus.FORBIDDEN, "C006", "권한이 없습니다."),
 	ALREADY_DELETED_MENU(HttpStatus.CONFLICT, "M002", "이미 삭제된 메뉴입니다.");
-
 
 	private final HttpStatus httpStatus;
 	private final String code;
