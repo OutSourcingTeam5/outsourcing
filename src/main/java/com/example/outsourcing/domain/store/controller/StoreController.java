@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.outsourcing.common.response.CommonResponse;
 import com.example.outsourcing.domain.store.dto.request.StoreRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreUpdateResponseDto;
 import com.example.outsourcing.domain.store.service.StoreService;
@@ -34,7 +35,7 @@ public class StoreController {
 
 	@PatchMapping("/{storeId}")
 	public CommonResponse<StoreUpdateResponseDto> updateStore(@RequestAttribute("userId") Long userId,
-		@PathVariable("storeId") Long storeId, @Valid @RequestBody StoreRequestDto dto) {
+		@PathVariable("storeId") Long storeId, @Valid @RequestBody StoreUpdateRequestDto dto) {
 
 		return CommonResponse.ok(storeservice.updateStore(userId, storeId, dto));
 	}

@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.hibernate.annotations.DynamicUpdate;
 
-import com.example.outsourcing.domain.store.dto.request.StoreRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.enums.Category;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.user.entity.User;
@@ -72,7 +72,7 @@ public class Store {
 		this.user = user;
 	}
 
-	public void update(StoreRequestDto dto) {
+	public void update(StoreUpdateRequestDto dto) {
 		if (dto.getName() != null) {
 			this.name = dto.getName();
 		}

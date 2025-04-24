@@ -21,15 +21,18 @@ public class StoreRequestDto {
 	@Length(max = 20, message = "가게명은 20자 이내로 작성해주세요. ")
 	private String name;
 
+	@NotBlank(message = "오픈 시간은 필수값입니다.")
 	@Pattern(regexp = "^([0-1][0-9]|[2][0-3]):([0-5][0-9])$", message = "시간은 00:00 형식으로 입력해야 하며, 24시간제입니다.")
 	private String openTime;
 
+	@NotBlank(message = "마감 시간은 필수값입니다.")
 	@Pattern(regexp = "^([0-1][0-9]|[2][0-3]):([0-5][0-9])$", message = "시간은 00:00 형식으로 입력해야 하며, 24시간제입니다.")
 	private String closeTime;
 
 	@NotNull(message = "최소주문금액은 필수값입니다.")
 	private Integer minOrderPrice;
 
+	@NotBlank(message = "카테고리는 필수값입니다.")
 	@EnumCategory(target = Category.class, message = "올바른 카테고리를 작성해주세요.")
 	private String category;
 

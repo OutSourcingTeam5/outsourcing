@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.outsourcing.domain.store.dto.request.StoreRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreUpdateResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
@@ -32,7 +33,7 @@ public class StoreService {
 
 		long storeCount = storeRepository.countByUser(user);
 
-		if (storeCount == 3) {
+		if (storeCount >= 3) {
 			throw new StoreException(StoreErrorCode.STORE_LIMIT_REACHED);
 		}
 
@@ -51,12 +52,19 @@ public class StoreService {
 	}
 
 	@Transactional
-	public StoreUpdateResponseDto updateStore(Long userId, Long storeId, StoreRequestDto dto) {
+	public StoreUpdateResponseDto updateStore(Long userId, Long storeId, StoreUpdateRequestDto dto) {
+
+		System.out.println("💡 updateStore 진입!");
 
 		User user = checkOwnerOrThrow(userId);
 
+		System.out.println("userId = " + userId);
+		System.out.println("userRole = " + user.getRole());
+
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
+
+		checkOwnerForStore(user, store);
 
 		store.update(dto);
 
@@ -71,6 +79,8 @@ public class StoreService {
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
 
+		checkOwnerForStore(user, store);
+
 		store.updateStoreStatus(StoreStatus.CLOSED);
 	}
 
@@ -78,11 +88,20 @@ public class StoreService {
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new StoreException(StoreErrorCode.USER_NOT_FOUND));
 
+		System.out.println(user.getRole());
+
 		if (!Role.OWNER.equals(user.getRole())) {
-			throw new StoreException(StoreErrorCode.STORE_UNAUTHORIZED);
+			throw new StoreException(StoreErrorCode.STORE_FORBIDDEN_NORMAL);
 		}
 
 		return user;
+	}
+
+	private void checkOwnerForStore(User user, Store store) {
+
+		if (!user.getId().equals(store.getUser().getId())) {
+			throw new StoreException(StoreErrorCode.STORE_FORBIDDEN);
+		}
 	}
 
 }
