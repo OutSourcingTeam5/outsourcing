@@ -41,4 +41,8 @@ public class Order extends BaseEntity {
 		this.storeId = storeId;
 		this.menuId = menuId;
 	}
+
+	public void setOrderStatus(OrderStatus orderStatus) {
+		this.orderStatus = orderStatus;
+	}
 }
