@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Entity
@@ -19,6 +20,7 @@ public class Order extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Setter
 	@Column(nullable = false)
 	private OrderStatus orderStatus;
 
@@ -42,7 +44,4 @@ public class Order extends BaseEntity {
 		this.menuId = menuId;
 	}
 
-	public void setOrderStatus(OrderStatus orderStatus) {
-		this.orderStatus = orderStatus;
-	}
 }

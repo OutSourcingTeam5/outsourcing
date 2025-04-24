@@ -1,5 +1,7 @@
 package com.example.outsourcing.domain.order.controller;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -60,10 +62,22 @@ public class OrderController {
 		}
 
 		Long orderId = orderStatusChangeRequestDto.getOrderId();
-		OrderStatus newStatus = orderStatusChangeRequestDto.getOrderStatus();
 
-		OrderStatusChangeResponseDto responseDto = orderService.updateOrderStatus(orderId, newStatus, userId);
+		OrderStatusChangeResponseDto responseDto = orderService.updateOrderStatus(orderId, userId);
 		return CommonResponse.ok(responseDto);
+	}
+
+	@DeleteMapping("/{orderId}")
+	public CommonResponse<Void> deleteOrder(
+		@RequestAttribute(value = "userId", required = false) Long userId,
+		@PathVariable Long orderId
+	) {
+		if (userId == null) {
+			throw new OrderException(OrderErrorCode.UNAUTHORIZED_USER);
+		}
+
+		orderService.deleteOrder(orderId, userId);
+		return CommonResponse.ok(null);
 	}
 
 }
