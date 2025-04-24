@@ -1,11 +1,19 @@
 package com.example.outsourcing.domain.store.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.outsourcing.domain.menu.dto.MenuResponse;
 import com.example.outsourcing.domain.store.dto.request.StoreRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
+import com.example.outsourcing.domain.store.dto.response.SliceResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreSingleResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreUpdateResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreWithdrawResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
@@ -32,11 +40,13 @@ public class StoreService {
 
 		User user = checkOwnerOrThrow(userId);
 
-		long storeCount = storeRepository.countByUser(user);
+		long storeCount = storeRepository.countByUserAndStoreStatus(user, StoreStatus.OPEN);
 
-		if (storeCount >= 3) {
+		if (storeCount == 3) {
 			throw new StoreException(StoreErrorCode.STORE_LIMIT_REACHED);
 		}
+
+		//결과
 
 		Store store = new Store(
 			dto.getName(),
@@ -52,15 +62,28 @@ public class StoreService {
 		return new StoreSaveResponseDto(store);
 	}
 
+	@Transactional(readOnly = true)
+	public StoreSingleResponseDto findSingleStore(Long storeId) {
+
+		Store store = storeRepository.findStoreByIdWithMenus(storeId)
+			.orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
+
+		if (StoreStatus.CLOSED.equals(store.getStoreStatus())) {
+			throw new StoreException(StoreErrorCode.STORE_NOT_FOUND);
+		}
+
+		List<MenuResponse> menuResponseList = store.getMenus()
+			.stream()
+			.map(menu -> new MenuResponse(menu.getId(), menu.getName(), menu.getPrice(), menu.getDescription()))
+			.toList();
+
+		return new StoreSingleResponseDto(store, menuResponseList);
+	}
+
 	@Transactional
 	public StoreUpdateResponseDto updateStore(Long userId, Long storeId, StoreUpdateRequestDto dto) {
 
-		System.out.println("💡 updateStore 진입!");
-
 		User user = checkOwnerOrThrow(userId);
-
-		System.out.println("userId = " + userId);
-		System.out.println("userRole = " + user.getRole());
 
 		Store store = storeRepository.findById(storeId)
 			.orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND));
@@ -82,7 +105,7 @@ public class StoreService {
 
 		checkOwnerForStore(user, store);
 
-		store.updateStoreStatus(StoreStatus.CLOSED);
+		store.delete(StoreStatus.CLOSED);
 
 		return new StoreWithdrawResponseDto(store,
 			"가게 폐업 처리 되었습니다.");
@@ -108,4 +131,15 @@ public class StoreService {
 		}
 	}
 
+	public SliceResponseDto<StoreResponseDto> findAllStore(int page, String nameSearch) {
+
+		int adjustedPage = (page > 0) ? page - 1 : 0;
+		Pageable pageable = PageRequest.of(adjustedPage, 10);
+
+		// Slice<StoreResponseDto> allStore = storeRepository.findAllStore(pageable, nameSearch);
+
+		storeRepository.findAllstores(nameSearch, pageable);
+
+		return null;
+	}
 }
