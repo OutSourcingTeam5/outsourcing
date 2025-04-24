@@ -34,13 +34,14 @@ public class StoreController {
 
 	@PatchMapping("/{storeId}")
 	public CommonResponse<StoreUpdateResponseDto> updateStore(@RequestAttribute("userId") Long userId,
-		@PathVariable Long storeId, @Valid @RequestBody StoreRequestDto dto) {
+		@PathVariable("storeId") Long storeId, @Valid @RequestBody StoreRequestDto dto) {
 
 		return CommonResponse.ok(storeservice.updateStore(userId, storeId, dto));
 	}
 
 	@DeleteMapping("{storeId}")
-	public CommonResponse<Void> deleteStore(@RequestAttribute("userId") Long userId, @PathVariable Long storeId) {
+	public CommonResponse<Void> deleteStore(@RequestAttribute("userId") Long userId,
+		@PathVariable("storeId") Long storeId) {
 
 		storeservice.delete(userId, storeId);
 
