@@ -2,35 +2,31 @@ package com.example.outsourcing.domain.store.enums;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import jdk.jfr.Category;
 
+@SuppressWarnings("checkstyle:RegexpMultiline")
 public class EnumCategoryValidator implements ConstraintValidator<EnumCategory, String> {
 
-    private EnumCategory annotation;
+	private EnumCategory annotation;
 
-    @Override
-    public void initialize(EnumCategory constraintAnnotation) {
-        this.annotation = constraintAnnotation;
-    }
+	@Override
+	public void initialize(EnumCategory constraintAnnotation) {
+		this.annotation = constraintAnnotation;
+	}
 
-    @Override
-    public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
-        return value != null;
-    }
-
-//    @Override
-//    public boolean isValid(String value, ConstraintValidatorContext context) {
-//        Object[] enumValues =this.annotation.target().getEnumConstants();
-//        if(enumValues != null) {
-//            for (Object enumValue : enumValues) {
-//                if(value.equals(enumValue.toString())) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-
-
+	@Override
+	public boolean isValid(String value, ConstraintValidatorContext context) {
+		if (value == null || value.isBlank()) {
+			return true; // 빈 문자열도 허용하려면 이렇게
+		}
+		Object[] enumValues = this.annotation.target().getEnumConstants();
+		if (enumValues != null) {
+			for (Object enumValue : enumValues) {
+				if (value.equals(enumValue.toString())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 }

@@ -1,9 +1,13 @@
 package com.example.outsourcing.domain.store.enums;
 
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-
-import java.lang.annotation.*;
 
 @Documented
 @Target({ElementType.FIELD})
@@ -11,13 +15,12 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = EnumCategoryValidator.class)
 public @interface EnumCategory {
 
-    String message() default "Enum에 없는 값입니다.";
+	String message() default "Enum에 없는 값입니다.";
 
-    Class<?>[] groups() default { };
+	Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default { };
+	Class<? extends Payload>[] payload() default {};
 
-    Class<? extends Enum<?>> target();
-
+	Class<? extends Enum<?>> target();
 
 }

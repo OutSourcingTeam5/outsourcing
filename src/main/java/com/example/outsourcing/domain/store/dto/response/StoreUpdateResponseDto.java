@@ -4,12 +4,11 @@ import java.time.LocalTime;
 
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.Category;
-import com.example.outsourcing.domain.store.enums.StoreStatus;
 
 import lombok.Getter;
 
 @Getter
-public class StoreSaveResponseDto {
+public class StoreUpdateResponseDto {
 
 	private final Long id;
 
@@ -21,17 +20,14 @@ public class StoreSaveResponseDto {
 
 	private final Integer minOrderPrice;
 
-	private final StoreStatus storeStatus;
-
 	private final Category category;
 
-	public StoreSaveResponseDto(Store store) {
+	public StoreUpdateResponseDto(Store store) {
 		this.id = store.getId();
 		this.name = store.getName();
 		this.openTime = store.getOpenTime();
 		this.closeTime = store.getCloseTime();
 		this.minOrderPrice = store.getMinOrderPrice();
-		this.storeStatus = store.getStoreStatus();
 		this.category = store.getCategory();
 	}
 
