@@ -1,0 +1,1 @@
+package com.example.outsourcing.domain.menu.repository;import com.example.outsourcing.domain.menu.entity.Menu;import java.util.List;import org.springframework.data.jpa.repository.JpaRepository;public interface MenuRepository extends JpaRepository<Menu, Long> {	// 특정 가게의 메뉴만 조회	List<Menu> findByStatusAndStoreId(Menu.Status status, Long storeId);}
