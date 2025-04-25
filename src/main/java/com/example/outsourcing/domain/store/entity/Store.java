@@ -102,6 +102,11 @@ public class Store {
 	}
 
 	public void delete(StoreStatus storeStatus) {
+
+		this.storeStatus = storeStatus;
+	}
+
+	public void updateStoreStatus(StoreStatus storeStatus) {
 		this.storeStatus = storeStatus;
 	}
 

@@ -1,14 +1,5 @@
 package com.example.outsourcing.domain.auth.service;
 
-import java.time.LocalDateTime;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-
 import com.example.outsourcing.domain.auth.dto.AuthResponseDto;
 import com.example.outsourcing.domain.auth.dto.KakaoTokenResponse;
 import com.example.outsourcing.domain.auth.dto.KakaoUserInfo;
@@ -19,8 +10,14 @@ import com.example.outsourcing.domain.user.dto.UserResponseDto;
 import com.example.outsourcing.domain.user.entity.Role;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.repository.UserRepository;
-
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +30,7 @@ public class KakaoOAuthService {
 	@Value("${kakao.oauth.client-secret}")
 	private String clientSecret;
 
-	@Value("${kakao.oauth.redirect-uri}")
+	@Value("${kakao.redirect-uri}")
 	private String redirectUri;
 
 	private final WebClient webClient;
@@ -45,24 +42,24 @@ public class KakaoOAuthService {
 	public AuthResponseDto loginWithKakao(String code) {
 		// 1) 토큰 요청
 		KakaoTokenResponse token = webClient.post()
-			.uri("https://kauth.kakao.com/oauth/token")
-			.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-			.body(BodyInserters.fromFormData("grant_type", "authorization_code")
-				.with("client_id", clientId)
-				.with("client_secret", clientSecret)
-				.with("redirect_uri", redirectUri)
-				.with("code", code))
-			.retrieve()
-			.bodyToMono(KakaoTokenResponse.class)
-			.block();
+				.uri("https://kauth.kakao.com/oauth/token")
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.body(BodyInserters.fromFormData("grant_type", "authorization_code")
+						.with("client_id", clientId)
+						.with("client_secret", clientSecret)
+						.with("redirect_uri", redirectUri)
+						.with("code", code))
+				.retrieve()
+				.bodyToMono(KakaoTokenResponse.class)
+				.block();
 
 		// 2) 유저 정보 조회
 		KakaoUserInfo info = webClient.get()
-			.uri("https://kapi.kakao.com/v2/user/me")
-			.header("Authorization", "Bearer " + token.getAccess_token())
-			.retrieve()
-			.bodyToMono(KakaoUserInfo.class)
-			.block();
+				.uri("https://kapi.kakao.com/v2/user/me")
+				.header("Authorization", "Bearer " + token.getAccess_token())
+				.retrieve()
+				.bodyToMono(KakaoUserInfo.class)
+				.block();
 
 		String oauthId = String.valueOf(info.getId());
 
@@ -76,35 +73,36 @@ public class KakaoOAuthService {
 
 		// ─── 2) 기존 유저 조회/신규 생성 ───────────────────────
 		User user = userRepository.findByProviderId(oauthId)
-			.orElseGet(() -> {
-				User newUser = User.builder()
-					.email(email)
-					.password("")
-					.name(info.getProperties().getNickname())
-					.role(Role.USER)
-					.provider("kakao")
-					.providerId(oauthId)
-					.build();
-				return userRepository.save(newUser);
-			});
+				.orElseGet(() -> {
+					User newUser = User.builder()
+							.email(email)
+							.password("")
+							.name(info.getProperties().getNickname())
+							.role(Role.USER)
+							.provider("kakao")
+							.providerId(oauthId)
+							.build();
+					return userRepository.save(newUser);
+				});
 
 		// ─── 3) JWT 발급 및 RefreshToken 저장 로직 ───────────────
 		String accessToken = jwtProvider.createAccessToken(user.getId());
 		String refreshToken = jwtProvider.createRefreshToken(user.getId());
 		refreshTokenRepository.findByUserId(user.getId())
-			.ifPresentOrElse(
-				existing -> existing.updateToken(refreshToken, LocalDateTime.now().plusDays(7)),
-				() -> refreshTokenRepository.save(
-					RefreshToken.builder()
-						.user(user)
-						.refreshToken(refreshToken)
-						.expiredAt(LocalDateTime.now().plusDays(7))
-						.build()
-				)
-			);
+				.ifPresentOrElse(
+						existing -> existing.updateToken(refreshToken,
+								LocalDateTime.now().plusDays(7)),
+						() -> refreshTokenRepository.save(
+								RefreshToken.builder()
+										.user(user)
+										.refreshToken(refreshToken)
+										.expiredAt(LocalDateTime.now().plusDays(7))
+										.build()
+						)
+				);
 
 		UserResponseDto dto = new UserResponseDto(
-			user.getId(), user.getEmail(), user.getName(), user.getRole());
+				user.getId(), user.getEmail(), user.getName(), user.getRole());
 		return new AuthResponseDto(accessToken, dto);
 	}
 }
