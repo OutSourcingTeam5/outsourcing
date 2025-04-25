@@ -131,4 +131,5 @@ public class AuthController {
 		AuthResponseDto authDto = kakaoOAuthService.loginWithKakao(code);
 		return CommonResponse.ok(authDto);
 	}
+
 }
