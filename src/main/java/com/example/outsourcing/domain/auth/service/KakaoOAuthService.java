@@ -27,13 +27,13 @@ import lombok.RequiredArgsConstructor;
 public class KakaoOAuthService {
 
 	// application.properties 에 등록한 키와 정확히 일치시킵니다.
-	@Value("${kakao.oauth.client-id}")
+	@Value("${YOUR_REST_API_KEY}")
 	private String clientId;
 
-	@Value("${kakao.oauth.client-secret}")
+	@Value("${YOUR_CLIENT_SECRET}")
 	private String clientSecret;
 
-	@Value("${kakao.oauth.redirect-uri}")
+	@Value("${REDIRECT_URI}")
 	private String redirectUri;
 
 	private final WebClient webClient;
