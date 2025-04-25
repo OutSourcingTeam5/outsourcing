@@ -5,6 +5,8 @@ import java.time.LocalTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.outsourcing.domain.menu.entity.Menu;
+import com.example.outsourcing.domain.menu.repository.MenuRepository;
 import com.example.outsourcing.domain.order.dto.response.OrderResponseDto;
 import com.example.outsourcing.domain.order.dto.response.OrderStatusChangeResponseDto;
 import com.example.outsourcing.domain.order.entity.Order;
@@ -14,6 +16,8 @@ import com.example.outsourcing.domain.order.exception.OrderException;
 import com.example.outsourcing.domain.order.repository.OrderRepository;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
+import com.example.outsourcing.domain.user.entity.User;
+import com.example.outsourcing.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,46 +26,36 @@ import lombok.RequiredArgsConstructor;
 public class OrderService {
 
 	private final OrderRepository orderRepository;
+	private final UserRepository userRepository;
 	private final StoreRepository storeRepository;
-	// private final MenuRepository menuRepository;
+	private final MenuRepository menuRepository;
 
 	@Transactional
 	public OrderResponseDto createOrder(Long userId, Long storeId, Long menuId, OrderStatus status) {
-		// 가게 존재 확인
-		if (!storeRepository.existsById(storeId)) {
-			throw new OrderException(OrderErrorCode.STORE_NOT_FOUND);
+		User user = getUserOrThrow(userId);
+		Store store = getStoreOrThrow(storeId);
+		Menu menu = getMenuOrThrow(menuId);
+
+		if (!menu.getStore().getId().equals(storeId)) {
+			throw new OrderException(OrderErrorCode.MENU_STORE_MISMATCH);
 		}
-		//
-		// // 메뉴 존재 확인
-		// if (!menuRepository.existsById(menuId)) {
-		// 	throw new OrderException(OrderErrorCode.MENU_NOT_FOUND);
-		// }
 
-		Store store = storeRepository.findById(storeId)
-			.orElseThrow(() -> new OrderException(OrderErrorCode.STORE_NOT_FOUND));
-
-		// 주문 시도한 userId와 가게 Owner가 같다면 예외 발생
 		if (store.getUser().getId().equals(userId)) {
 			throw new OrderException(OrderErrorCode.ORDER_FROM_OWNER_NOT_ALLOWED);
 		}
 
-		// ✨ 내가 만든 메서드로 열려있는지 체크
 		if (!isStoreOpen(store)) {
 			throw new OrderException(OrderErrorCode.STORE_CLOSED);
 		}
 
-		// 주문 생성
-		Order order = new Order(status, userId, storeId, menuId);
-
-		// 저장
+		Order order = new Order(status, user, store, menu);
 		Order savedOrder = orderRepository.save(order);
 
-		// 응답 DTO 생성
 		return new OrderResponseDto(
 			savedOrder.getId(),
-			savedOrder.getUserId(),
-			savedOrder.getStoreId(),
-			savedOrder.getMenuId(),
+			savedOrder.getUser().getId(),
+			savedOrder.getStore().getId(),
+			savedOrder.getMenu().getId(),
 			savedOrder.getOrderStatus(),
 			savedOrder.getCreatedAt()
 		);
@@ -69,48 +63,35 @@ public class OrderService {
 
 	@Transactional
 	public OrderStatusChangeResponseDto updateOrderStatus(Long orderId, Long userId) {
+		Order order = getOrderOrThrow(orderId);
+		Store store = getStoreOrThrow(order.getStore().getId());
 
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND));
-
-		Store store = storeRepository.findById(order.getStoreId())
-			.orElseThrow(() -> new OrderException(OrderErrorCode.STORE_NOT_FOUND));
-
-		// 로그인한 유저가 이 가게의 OWNER인지 확인
 		if (!store.getUser().getId().equals(userId)) {
 			throw new OrderException(OrderErrorCode.NOT_OWNER_OF_STORE);
 		}
 
-		// 상태 업데이트
 		OrderStatus newStatus = getNextStatus(order.getOrderStatus());
 		order.setOrderStatus(newStatus);
-
-		// 주문 저장 (상태 변경이 반영되며, `updatedAt`은 자동으로 갱신됨)
 		orderRepository.save(order);
 
-		// 상태 변경 후 응답 DTO 반환
 		return new OrderStatusChangeResponseDto(
 			order.getId(),
-			order.getUserId(),
-			order.getStoreId(),
-			order.getMenuId(),
+			order.getUser().getId(),
+			order.getStore().getId(),
+			order.getMenu().getId(),
 			order.getOrderStatus(),
 			order.getCreatedAt(),
-			order.getUpdatedAt()  // 상태 변경 후 업데이트된 시간
+			order.getUpdatedAt()
 		);
 	}
 
 	@Transactional
 	public void deleteOrder(Long orderId, Long userId) {
-
-		Order order = orderRepository.findById(orderId)
-			.orElseThrow(() -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND));
-
-		Store store = storeRepository.findById(order.getStoreId())
-			.orElseThrow(() -> new OrderException(OrderErrorCode.STORE_NOT_FOUND));
+		Order order = getOrderOrThrow(orderId);
+		Store store = getStoreOrThrow(order.getStore().getId());
 
 		boolean isOwner = store.getUser().getId().equals(userId);
-		boolean isOrderer = order.getUserId().equals(userId);
+		boolean isOrderer = order.getUser().getId().equals(userId);
 
 		if (!isOwner && !isOrderer) {
 			throw new OrderException(OrderErrorCode.NO_DELETE_AUTHORITY);
@@ -121,6 +102,26 @@ public class OrderService {
 		}
 
 		orderRepository.delete(order);
+	}
+
+	private User getUserOrThrow(Long userId) {
+		return userRepository.findById(userId)
+			.orElseThrow(() -> new OrderException(OrderErrorCode.UNAUTHORIZED_USER));
+	}
+
+	private Store getStoreOrThrow(Long storeId) {
+		return storeRepository.findById(storeId)
+			.orElseThrow(() -> new OrderException(OrderErrorCode.STORE_NOT_FOUND));
+	}
+
+	private Menu getMenuOrThrow(Long menuId) {
+		return menuRepository.findById(menuId)
+			.orElseThrow(() -> new OrderException(OrderErrorCode.MENU_NOT_FOUND));
+	}
+
+	private Order getOrderOrThrow(Long orderId) {
+		return orderRepository.findById(orderId)
+			.orElseThrow(() -> new OrderException(OrderErrorCode.ORDER_NOT_FOUND));
 	}
 
 	private OrderStatus getNextStatus(OrderStatus currentStatus) {
@@ -136,7 +137,6 @@ public class OrderService {
 		LocalTime open = store.getOpenTime();
 		LocalTime close = store.getCloseTime();
 
-		// 밤 장사 고려 (ex. 22:00 ~ 03:00)
 		if (close.isBefore(open)) {
 			return now.isAfter(open) || now.isBefore(close);
 		}
