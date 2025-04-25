@@ -1,12 +1,18 @@
 package com.example.outsourcing.domain.order.entity;
 
 import com.example.outsourcing.common.entity.BaseEntity;
+import com.example.outsourcing.domain.menu.entity.Menu;
+import com.example.outsourcing.domain.store.entity.Store;
+import com.example.outsourcing.domain.user.entity.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,24 +30,35 @@ public class Order extends BaseEntity {
 	@Column(nullable = false)
 	private OrderStatus orderStatus;
 
-	@Column(nullable = false)
-	private Long userId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
-	@Column(nullable = false)
-	private Long menuId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "store_id", nullable = false)
+	private Store store;
 
-	@Column(nullable = false)
-	private Long storeId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "menu_id", nullable = false)
+	private Menu menu;
 
 	public Order() {
 
 	}
 
-	public Order(OrderStatus orderStatus, Long userId, Long storeId, Long menuId) {
+	public Order(OrderStatus orderStatus, User user, Store store, Menu menu) {
 		this.orderStatus = orderStatus;
-		this.userId = userId;
-		this.storeId = storeId;
-		this.menuId = menuId;
+		this.user = user;
+		this.store = store;
+		this.menu = menu;
+	}
+
+	public Order(Long id, OrderStatus orderStatus, User user, Store store, Menu menu) {
+		this.id = id;
+		this.orderStatus = orderStatus;
+		this.user = user;
+		this.store = store;
+		this.menu = menu;
 	}
 
 }
