@@ -47,6 +47,10 @@ public class OrderService {
 		if (!isStoreOpen(store)) {
 			throw new OrderException(OrderErrorCode.STORE_CLOSED);
 		}
+		// ✅ 최소 주문 금액 확인
+		if (menu.getPrice() < store.getMinOrderPrice()) {
+			throw new OrderException(OrderErrorCode.MIN_ORDER_PRICE_NOT_MET);
+		}
 
 		Order order = new Order(status, user, store, menu);
 		Order savedOrder = orderRepository.save(order);
