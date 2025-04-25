@@ -32,8 +32,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     //시큐리티 관련 다 삭제함
-
-
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
