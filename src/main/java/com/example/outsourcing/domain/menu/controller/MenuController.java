@@ -9,13 +9,12 @@ import com.example.outsourcing.domain.menu.service.MenuService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,43 +26,49 @@ public class MenuController {
 
 	private final MenuService menuService;
 
-	// 메뉴 생성 API
+	/**
+	 * 메뉴를 생성하는 API. 로그인된 사용자의 ID를 기반으로, 해당 사용자가 소유한 가게에만 메뉴를 생성
+	 */
 	@PostMapping
-	public ResponseEntity<CommonResponse<MenuResultResponse>> createMenu(
-			@RequestBody @Valid MenuCreateRequest request
+	public CommonResponse<MenuResultResponse> createMenu(
+			@RequestBody @Valid MenuCreateRequest request,
+			@RequestAttribute("userId") Long currentUserId
 	) {
-		Long currentUserId = 1L; // 임시 하드코딩 (인증 연동 시 수정 예정)
-		MenuResultResponse response = menuService.create(request, currentUserId);
-		return ResponseEntity.status(HttpStatus.CREATED).body(CommonResponse.created(response));
+		return CommonResponse.created(menuService.create(request, currentUserId));
 	}
 
-	// 가게 메뉴 조회 API
+	/**
+	 * 가게의 메뉴 목록을 조회하는 API. 메뉴는 활성상태인 경우에만 조회
+	 */
 	@GetMapping("/stores/{storeId}/menus")
-	public ResponseEntity<CommonResponse<List<MenuResponse>>> getMenusByStore(
+	public CommonResponse<List<MenuResponse>> getMenusByStore(
 			@PathVariable Long storeId
 	) {
-		List<MenuResponse> menus = menuService.getMenusByStore(storeId);
-		return ResponseEntity.ok(CommonResponse.ok(menus));
+		return CommonResponse.ok(menuService.getMenusByStore(storeId));
 	}
 
-	// 메뉴 수정 API
+	/**
+	 * 메뉴 정보를 수정하는 API. 메뉴가 소속된 가게의 오너와 로그인 사용자가 일치할 때만 수정가능
+	 */
+
 	@PutMapping("/{menuId}")
-	public ResponseEntity<CommonResponse<MenuResultResponse>> updateMenu(
+	public CommonResponse<MenuResultResponse> updateMenu(
 			@PathVariable Long menuId,
-			@RequestBody @Valid MenuUpdateRequest request
+			@RequestBody @Valid MenuUpdateRequest request,
+			@RequestAttribute("userId") Long currentUserId
 	) {
-		Long currentUserId = 1L;
-		MenuResultResponse response = menuService.update(menuId, request, currentUserId);
-		return ResponseEntity.ok(CommonResponse.ok(response));
+		return CommonResponse.ok(menuService.update(menuId, request, currentUserId));
 	}
 
-	// 메뉴 삭제 API
+	/**
+	 * 메뉴를 삭제하는 API. 실제 삭제가 아닌 Soft Delete 방식으로 상태를 deleted로 변경. 메뉴가 소속된 가게의 오너와 로그인 사용자가 일치할
+	 * 때만삭제가능
+	 */
 	@DeleteMapping("/{menuId}")
-	public ResponseEntity<CommonResponse<MenuResultResponse>> deleteMenu(
-			@PathVariable Long menuId
+	public CommonResponse<MenuResultResponse> deleteMenu(
+			@PathVariable Long menuId,
+			@RequestAttribute("userId") Long currentUserId
 	) {
-		Long currentUserId = 1L;
-		MenuResultResponse response = menuService.delete(menuId, currentUserId);
-		return ResponseEntity.ok(CommonResponse.ok(response));
+		return CommonResponse.ok(menuService.delete(menuId, currentUserId));
 	}
 }
