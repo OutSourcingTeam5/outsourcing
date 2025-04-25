@@ -52,7 +52,7 @@ public class StoreService {
 			dto.getOpenTime(),
 			dto.getCloseTime(),
 			dto.getMinOrderPrice(),
-			StoreStatus.PREPARING,
+			StoreStatus.OPEN,
 			Category.valueOf(dto.getCategory()),
 			user);
 
