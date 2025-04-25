@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,6 +34,8 @@ import com.example.outsourcing.domain.store.dto.response.StoreWithdrawResponseDt
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.Category;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
+import com.example.outsourcing.domain.store.exception.StoreErrorCode;
+import com.example.outsourcing.domain.store.exception.StoreException;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.Role;
 import com.example.outsourcing.domain.user.entity.User;
@@ -54,6 +57,7 @@ class StoreServiceTest {
 	private StoreService storeService;
 
 	@Test
+	@DisplayName("가게 생성 테스트")
 	public void saveStore_success() {
 
 		//given
@@ -87,6 +91,7 @@ class StoreServiceTest {
 	}
 
 	@Test
+	@DisplayName("가게 단건 조회 테스트")
 	public void findSingleStore_success() {
 
 		//given
@@ -122,6 +127,7 @@ class StoreServiceTest {
 	}
 
 	@Test
+	@DisplayName("가게 수정 테스트")
 	public void updateStore_success() {
 
 		Long userId = 1L;
@@ -151,6 +157,7 @@ class StoreServiceTest {
 	}
 
 	@Test
+	@DisplayName("가게 삭제 테스트")
 	public void delete() {
 		//given
 		Long userId = 1L;
@@ -179,6 +186,7 @@ class StoreServiceTest {
 	}
 
 	@Test
+	@DisplayName("가게 전체 조회, 검색 테스트")
 	public void findAllStore() {
 		Long userId = 1L;
 		Long storeId = 1L;
@@ -195,13 +203,70 @@ class StoreServiceTest {
 
 		Pageable pageable = PageRequest.of(0, 10);
 
-		given(storeRepository.findAllstores(anyString(), StoreStatus.OPEN, any(Pageable.class)))
+		given(storeRepository.findAllstores(anyString(), eq(StoreStatus.OPEN), any(Pageable.class)))
 			.willReturn(new SliceImpl<>(List.of(store4, store5)));
 
 		// when
 		SliceResponseDto<StoreResponseDto> allstores = storeService.findAllStore(1, "타코");
 
 		// then
-		assertThat(allstores.getStoreList().size() == 2);
+		assertEquals(2, allstores.getStoreList().size());
+
 	}
+
+	@Test
+	@DisplayName("")
+	public void ifOwnerHasMoreThan3StoresThanThrow() {
+
+		//given
+		Long userId = 1L;
+		Long storeId = 1L;
+
+		User user = User.builder()
+			.email("user1@example.com")
+			.password("Aa1234!@")
+			.name("홍길동")
+			.role(Role.OWNER)
+			.build();
+
+		StoreRequestDto dto = new StoreRequestDto("칙스칙스", "01:00", "12:00", 15000, "WESTERN");
+
+		given(userRepository.findById(eq(1L))).willReturn(Optional.of(user));
+		given(storeRepository.countByUserAndStoreStatus(eq(user), eq(StoreStatus.OPEN))).willReturn(3L);
+
+		//when
+		StoreException exception = assertThrows(StoreException.class, () -> {
+			storeService.saveStore(1L, dto);
+		});
+
+		//then
+		assertEquals(StoreErrorCode.STORE_LIMIT_REACHED.getMessage(), exception.getMessage());
+
+	}
+
+	@Test
+	public void ifStoreStatusClosedThanThrow() {
+
+		//given
+		User user = User.builder()
+			.email("user1@example.com")
+			.password("Aa1234!@")
+			.name("홍길동")
+			.role(Role.OWNER)
+			.build();
+
+		Store store = new Store("기존이름", "09:00", "18:00", 10000, StoreStatus.CLOSED, Category.WESTERN, user);
+
+		given(storeRepository.findStoreByIdWithMenus(anyLong())).willReturn(Optional.of(store));
+
+		//when
+		StoreException exception = assertThrows(StoreException.class, () -> {
+			storeService.findSingleStore(anyLong());
+		});
+
+		//then
+		assertEquals(StoreErrorCode.STORE_NOT_FOUND.getMessage(), exception.getMessage());
+
+	}
+
 }
