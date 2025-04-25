@@ -132,6 +132,10 @@ public class StoreService {
 
 	private User checkOwnerOrThrow(Long userId) {
 
+		if (userId == null) {
+			throw new StoreException(StoreErrorCode.STORE_USER_NOT_LOGIN);
+		}
+
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new StoreException(StoreErrorCode.USER_NOT_FOUND));
 
