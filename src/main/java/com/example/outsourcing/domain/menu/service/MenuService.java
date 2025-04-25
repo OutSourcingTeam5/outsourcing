@@ -1,5 +1,9 @@
 package com.example.outsourcing.domain.menu.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.example.outsourcing.common.exception.CustomException;
 import com.example.outsourcing.domain.menu.dto.MenuCreateRequest;
 import com.example.outsourcing.domain.menu.dto.MenuResponse;
@@ -10,9 +14,9 @@ import com.example.outsourcing.domain.menu.exception.MenuErrorCode;
 import com.example.outsourcing.domain.menu.repository.MenuRepository;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
-import java.util.List;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -26,14 +30,14 @@ public class MenuService {
 	 */
 	public MenuResultResponse create(MenuCreateRequest request, Long currentUserId) {
 		Store store = storeRepository.findById(request.getStoreId())
-				.orElseThrow(() -> new CustomException(MenuErrorCode.STORE_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(MenuErrorCode.STORE_NOT_FOUND));
 
 		if (!store.getUser().getId().equals(currentUserId)) {
 			throw new CustomException(MenuErrorCode.FORBIDDEN);
 		}
 
 		Menu menu = new Menu(store, request.getName(), request.getPrice(),
-				request.getDescription());
+			request.getDescription());
 		Menu saved = menuRepository.save(menu);
 
 		return new MenuResultResponse(saved.getId(), "메뉴가 등록되었습니다.");
@@ -52,9 +56,10 @@ public class MenuService {
 	 * 삭제된 메뉴는 수정이 불가능하며 사용자가 가게의 오너일 경우에만 수정가능.
 	 */
 
+	@Transactional
 	public MenuResultResponse update(Long menuId, MenuUpdateRequest request, Long currentUserId) {
 		Menu menu = menuRepository.findById(menuId)
-				.orElseThrow(() -> new CustomException(MenuErrorCode.MENU_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(MenuErrorCode.MENU_NOT_FOUND));
 
 		if (menu.getStatus() == Menu.Status.DELETED) {
 			throw new CustomException(MenuErrorCode.ALREADY_DELETED_MENU);
@@ -73,7 +78,7 @@ public class MenuService {
 	 */
 	public MenuResultResponse delete(Long menuId, Long currentUserId) {
 		Menu menu = menuRepository.findById(menuId)
-				.orElseThrow(() -> new CustomException(MenuErrorCode.MENU_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(MenuErrorCode.MENU_NOT_FOUND));
 
 		if (menu.getStatus() == Menu.Status.DELETED) {
 			throw new CustomException(MenuErrorCode.ALREADY_DELETED_MENU);
