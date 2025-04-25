@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -100,6 +101,7 @@ public class AuthController {
 	/**
 	 * 로그아웃 (RefreshToken 삭제)
 	 */
+	@Transactional
 	@PostMapping("/logout")
 	public CommonResponse<Void> logout(@RequestAttribute("userId") Long userId) {
 		refreshTokenRepository.deleteByUserId(userId);
