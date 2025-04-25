@@ -20,7 +20,8 @@ public enum OrderErrorCode implements BaseCode {
 	ORDER_FROM_OWNER_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "OR08", "본인 가게에는 주문할 수 없습니다."),
 	NO_DELETE_AUTHORITY(HttpStatus.BAD_REQUEST, "OR09", "주문자 또는 가게의 사장만 삭제할 수 있습니다."),
 	CANNOT_DELETE_COMPLETED_ORDER(HttpStatus.BAD_REQUEST, "OR10", "완료된 주문은 삭제할 수 없습니다."),
-	MENU_STORE_MISMATCH(HttpStatus.BAD_REQUEST, "OR11", "해당 가게에 등록된 메뉴가 아닙니다.");
+	MENU_STORE_MISMATCH(HttpStatus.BAD_REQUEST, "OR11", "해당 가게에 등록된 메뉴가 아닙니다."),
+	MIN_ORDER_PRICE_NOT_MET(HttpStatus.BAD_REQUEST, "OR12", "최소 주문 금액을 충족하지 않습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

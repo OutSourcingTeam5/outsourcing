@@ -52,7 +52,7 @@ public class StoreService {
 			dto.getOpenTime(),
 			dto.getCloseTime(),
 			dto.getMinOrderPrice(),
-			StoreStatus.PREPARING,
+			StoreStatus.OPEN,
 			Category.valueOf(dto.getCategory()),
 			user);
 
@@ -131,6 +131,10 @@ public class StoreService {
 	}
 
 	private User checkOwnerOrThrow(Long userId) {
+
+		if (userId == null) {
+			throw new StoreException(StoreErrorCode.STORE_USER_NOT_LOGIN);
+		}
 
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new StoreException(StoreErrorCode.USER_NOT_FOUND));
