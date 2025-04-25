@@ -47,14 +47,12 @@ public class StoreService {
 			throw new StoreException(StoreErrorCode.STORE_LIMIT_REACHED);
 		}
 
-		//결과
-
 		Store store = new Store(
 			dto.getName(),
 			dto.getOpenTime(),
 			dto.getCloseTime(),
 			dto.getMinOrderPrice(),
-			StoreStatus.OPEN,
+			StoreStatus.PREPARING,
 			Category.valueOf(dto.getCategory()),
 			user);
 
@@ -79,6 +77,26 @@ public class StoreService {
 			.toList();
 
 		return new StoreSingleResponseDto(store, menuResponseList);
+	}
+
+	@Transactional(readOnly = true)
+	public SliceResponseDto<StoreResponseDto> findAllStore(int page, String nameSearch) {
+
+		int adjustedPage = (page > 0) ? page - 1 : 0;
+		Pageable pageable = PageRequest.of(adjustedPage, 10);
+
+		Slice<Store> allstores = storeRepository.findAllstores(nameSearch, StoreStatus.OPEN, pageable);
+
+		List<StoreResponseDto> storeDtoList = allstores.stream()
+			.map(store -> new StoreResponseDto(store.getName(), store.getMinOrderPrice()))
+			.toList();
+
+		return new SliceResponseDto<>(
+			storeDtoList,
+			allstores.getNumber(),
+			allstores.getSize(),
+			allstores.isFirst(),
+			allstores.isLast());
 	}
 
 	@Transactional
@@ -113,10 +131,9 @@ public class StoreService {
 	}
 
 	private User checkOwnerOrThrow(Long userId) {
+
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new StoreException(StoreErrorCode.USER_NOT_FOUND));
-
-		System.out.println(user.getRole());
 
 		if (!Role.OWNER.equals(user.getRole())) {
 			throw new StoreException(StoreErrorCode.STORE_FORBIDDEN_NORMAL);
@@ -132,24 +149,4 @@ public class StoreService {
 		}
 	}
 
-	public SliceResponseDto<StoreResponseDto> findAllStore(int page, String nameSearch) {
-
-		int adjustedPage = (page > 0) ? page - 1 : 0;
-		Pageable pageable = PageRequest.of(adjustedPage, 10);
-
-		// Slice<StoreResponseDto> allStore = storeRepository.findAllStore(pageable, nameSearch);
-
-		Slice<Store> allstores = storeRepository.findAllstores(nameSearch, pageable);
-
-		List<StoreResponseDto> storeDtoList = allstores.stream()
-			.map(store -> new StoreResponseDto(store.getName(), store.getMinOrderPrice()))
-			.toList();
-
-		return new SliceResponseDto<>(
-			storeDtoList,
-			allstores.getNumber(),
-			allstores.getSize(),
-			allstores.isFirst(),
-			allstores.isLast());
-	}
 }
