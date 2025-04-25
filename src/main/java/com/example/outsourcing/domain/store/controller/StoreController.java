@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.outsourcing.common.response.CommonResponse;
+import com.example.outsourcing.domain.review.service.ReviewService;
 import com.example.outsourcing.domain.store.dto.request.StoreRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.response.SliceResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreReviewsResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreSingleResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreUpdateResponseDto;
@@ -31,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class StoreController {
 
 	private final StoreService storeService;
+	private final ReviewService reviewService;
 
 	@PostMapping
 	public CommonResponse<StoreSaveResponseDto> saveStore(@RequestAttribute("userId") Long userId,
@@ -69,6 +72,15 @@ public class StoreController {
 		@PathVariable("storeId") Long storeId) {
 
 		return CommonResponse.ok(storeService.delete(userId, storeId));
+	}
+
+	@GetMapping("/{storeId}/reviews")
+	public CommonResponse<StoreReviewsResponseDto> findReviews(@RequestAttribute("userId") Long userId,
+		@PathVariable Long storeId,
+		@RequestParam(value = "startRating", required = true) Integer startRating,
+		@RequestParam(value = "endRating", required = true) Integer endRating) {
+
+		return CommonResponse.ok(reviewService.findReviews(userId, storeId, startRating, endRating));
 	}
 
 }
