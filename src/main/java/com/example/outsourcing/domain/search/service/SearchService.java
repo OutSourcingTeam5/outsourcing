@@ -1,11 +1,16 @@
 package com.example.outsourcing.domain.search.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.outsourcing.domain.redis.service.RedisService;
+import com.example.outsourcing.domain.search.dto.response.SearchRankingDto;
 import com.example.outsourcing.domain.search.repository.SearchRepository;
 import com.example.outsourcing.domain.store.dto.response.SliceResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreResponseDto;
@@ -18,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class SearchService {
 
 	private final SearchRepository searchRepository;
+	private final RedisService redisService;
 
 	@Transactional(readOnly = true)
 	public SliceResponseDto<StoreResponseDto> searchKeyword(Long userId, String keyword, int page) {
@@ -29,13 +35,31 @@ public class SearchService {
 
 		Slice<StoreResponseDto> foundStores = searchRepository.searchStores(keyword, categoryKeyword, pageable);
 
+		if (!foundStores.isEmpty() && keyword.length() > 1) {
+			redisService.addKeyword(keyword);
+		}
+
 		return new SliceResponseDto<>(
 			foundStores.getContent(),
 			foundStores.getNumber(),
 			foundStores.getSize(),
 			foundStores.isFirst(),
-			foundStores.isLast()
-		);
+			foundStores.isLast());
+	}
+
+	public List<SearchRankingDto> getRanking(Long userId) {
+
+		List<String> keywords = redisService.getRankingKeyword();
+
+		List<SearchRankingDto> rankingList = new ArrayList<>();
+
+		for (int i = 0; i < keywords.size(); i++) {
+
+			rankingList.add(new SearchRankingDto(i + 1, keywords.get(i)));
+
+		}
+
+		return rankingList;
 	}
 
 	private String checkKeywordCategory(String keyword) {
