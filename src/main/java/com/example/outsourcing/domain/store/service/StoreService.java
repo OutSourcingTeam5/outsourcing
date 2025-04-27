@@ -88,7 +88,7 @@ public class StoreService {
 		Slice<Store> allstores = storeRepository.findAllstores(nameSearch, StoreStatus.OPEN, pageable);
 
 		List<StoreResponseDto> storeDtoList = allstores.stream()
-			.map(store -> new StoreResponseDto(store.getName(), store.getMinOrderPrice()))
+			.map(store -> new StoreResponseDto(store.getId(), store.getName(), store.getMinOrderPrice()))
 			.toList();
 
 		return new SliceResponseDto<>(

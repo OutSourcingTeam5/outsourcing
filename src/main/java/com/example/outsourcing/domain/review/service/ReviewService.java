@@ -44,10 +44,6 @@ public class ReviewService {
 		Order order = orderRepository.findById(dto.getOrderId())
 			.orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_ORDER_NOT_FOUND));
 
-		System.out.println("== order ID: " + order.getId());
-		System.out.println("== order user ID: " + order.getUser().getId());
-		System.out.println("== order status: " + order.getOrderStatus());
-
 		if (!order.getUser().getId().equals(userId)) {
 			throw new ReviewException(ReviewErrorCode.REVIEW_USER_NOT_CUSTOMER);
 		}
@@ -86,9 +82,11 @@ public class ReviewService {
 			Collectors.toList());
 
 		return new StoreReviewsResponseDto(storeId, responses);
+
 	}
 
 	private User checkUser(Long userId) {
+		
 		if (userId == null) {
 			throw new StoreException(ReviewErrorCode.REVIEW_USER_NOT_LOGIN);
 		}
