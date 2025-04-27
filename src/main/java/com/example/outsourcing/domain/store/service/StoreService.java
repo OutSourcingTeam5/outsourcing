@@ -36,6 +36,15 @@ public class StoreService {
 	private final StoreRepository storeRepository;
 	private final UserRepository userRepository;
 
+	/**
+	 * 가게 생성
+	 * - 사장만 가게를 생성할 수 있다.
+	 * @author 조아현
+	 * @Param userId
+	 * @Param StoreRequestDto
+	 * @Return StoreSaveResponseDto
+	 * @since 2025 04 23
+	 */
 	@Transactional
 	public StoreSaveResponseDto saveStore(Long userId, StoreRequestDto dto) {
 
@@ -61,6 +70,14 @@ public class StoreService {
 		return new StoreSaveResponseDto(store);
 	}
 
+	/**
+	 * 가게 단건 조회
+	 * - 가게의 메뉴 목록도 함께 조회
+	 * @author 조아현
+	 * @Param storeId
+	 * @Return StoreSingleResponseDto
+	 * @since 2025 04 25
+	 */
 	@Transactional(readOnly = true)
 	public StoreSingleResponseDto findSingleStore(Long storeId) {
 
@@ -79,6 +96,15 @@ public class StoreService {
 		return new StoreSingleResponseDto(store, menuResponseList);
 	}
 
+	/**
+	 * 가게 목록 조회
+	 * - 페이지네이션과 가게명 검색이 가능하다
+	 * @author 조아현
+	 * @Param page
+	 * @Param nameSearch
+	 * @Return SliceResponseDto < StoreResponseDto>
+	 * @since 2025 04 25
+	 */
 	@Transactional(readOnly = true)
 	public SliceResponseDto<StoreResponseDto> findAllStore(int page, String nameSearch) {
 
@@ -99,6 +125,15 @@ public class StoreService {
 			allstores.isLast());
 	}
 
+	/**
+	 * 가게 수정
+	 * @author 조아현
+	 * @Param userId
+	 * @Param storeId
+	 * @Param StoreUpdateRequestDto
+	 * @Return CommonResponse<StoreUpdateResponseDto>
+	 * @since 2025 04 25
+	 */
 	@Transactional
 	public StoreUpdateResponseDto updateStore(Long userId, Long storeId, StoreUpdateRequestDto dto) {
 
@@ -114,6 +149,14 @@ public class StoreService {
 		return new StoreUpdateResponseDto(store);
 	}
 
+	/**
+	 * 가게 삭제
+	 * @author 조아현
+	 * @Param userId
+	 * @Param storeId
+	 * @Return CommonResponse<StoreWithdrawResponseDto>
+	 * @since 2025 04 25
+	 */
 	@Transactional
 	public StoreWithdrawResponseDto delete(Long userId, Long storeId) {
 
@@ -130,6 +173,14 @@ public class StoreService {
 			"가게 폐업 처리 되었습니다.");
 	}
 
+	/**
+	 * userId 검증 메서드
+	 * - 비로그인 유저, 유저 역할(사장,일반) 검증
+	 * @author 조아현
+	 * @Param userId
+	 * @Return User
+	 * @since 2025 04 25
+	 */
 	private User checkOwnerOrThrow(Long userId) {
 
 		if (userId == null) {
@@ -146,6 +197,14 @@ public class StoreService {
 		return user;
 	}
 
+	/**
+	 * user 검증 메서드
+	 * - 가게 사장인지 확인
+	 * @author 조아현
+	 * @Param User
+	 * @Param Store
+	 * @since 2025 04 25
+	 */
 	private void checkOwnerForStore(User user, Store store) {
 
 		if (!user.getId().equals(store.getUser().getId())) {

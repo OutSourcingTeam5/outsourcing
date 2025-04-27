@@ -19,6 +19,13 @@ public class StoreStatusScheduler {
 
 	private final StoreRepository storeRepository;
 
+	/**
+	 * 가게 상태 업데이트 스케줄러
+	 * - PREPARING, OPEN, CLOSED
+	 * - 1분마다 전체 가게 중 오픈시간/마감시간이 현재 시각의 5분 내외인 데이터들만 가져와 상태를 연산 후 상태값을 알맞게 수정한다.
+	 * @author 조아현
+	 * @since 2025 04 26
+	 */
 	@Transactional
 	@Scheduled(cron = "0 * * * * *")
 	public void updateStoreStatus() {

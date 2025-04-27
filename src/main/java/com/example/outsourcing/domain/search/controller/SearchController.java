@@ -23,6 +23,15 @@ public class SearchController {
 
 	private final SearchService searchService;
 
+	/**
+	 * 통합 검색
+	 * @author 조아현
+	 * @since 2025 04 27
+	 * @param   userId
+	 * @param   keyword
+	 * @param   page
+	 * @return CommonResponse<SliceResponseDto < StoreResponseDto>>
+	 */
 	@GetMapping
 	public CommonResponse<SliceResponseDto<StoreResponseDto>> searchKeyword(@RequestAttribute("userId") Long userId,
 		@RequestParam("keyword") String keyword, @RequestParam(value = "page", defaultValue = "1") int page) {
@@ -30,6 +39,13 @@ public class SearchController {
 		return CommonResponse.ok(searchService.searchKeyword(userId, keyword, page));
 	}
 
+	/**
+	 * 인기 검색어 조회
+	 * @author 조아현
+	 * @since 2025 04 27
+	 * @param   userId
+	 * @return CommonResponse<List < SearchRankingDto>>
+	 */
 	@GetMapping("/ranking")
 	public CommonResponse<List<SearchRankingDto>> getRanking(@RequestAttribute("userId") Long userId) {
 

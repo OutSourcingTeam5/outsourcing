@@ -25,6 +25,15 @@ public class SearchService {
 	private final SearchRepository searchRepository;
 	private final RedisService redisService;
 
+	/**
+	 * 통합 검색
+	 * @author 조아현
+	 * @since 2025 04 27
+	 * @param   userId
+	 * @param   keyword
+	 * @param   page
+	 * @return SliceResponseDto<StoreResponseDto>
+	 */
 	@Transactional(readOnly = true)
 	public SliceResponseDto<StoreResponseDto> searchKeyword(Long userId, String keyword, int page) {
 
@@ -47,6 +56,14 @@ public class SearchService {
 			foundStores.isLast());
 	}
 
+	/**
+	 * 인기 검색어 조회
+	 * @author 조아현
+	 * @since 2025 04 27
+	 * @param   userId
+	 * @return List<SearchRankingDto>
+	 */
+	@Transactional(readOnly = true)
 	public List<SearchRankingDto> getRanking(Long userId) {
 
 		List<String> keywords = redisService.getRankingKeyword();
@@ -62,6 +79,13 @@ public class SearchService {
 		return rankingList;
 	}
 
+	/**
+	 * 입력된 검색값이 카테고리 value에 포함되는지 확인하는 메서드
+	 * @author 조아현
+	 * @since 2025 04 27
+	 * @param   keyword
+	 * @return String
+	 */
 	private String checkKeywordCategory(String keyword) {
 		for (Category category : Category.values()) {
 			if (category.getValue().contains(keyword)) {
