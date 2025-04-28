@@ -13,11 +13,13 @@ public class EnumCategoryValidator implements ConstraintValidator<EnumCategory, 
 		this.annotation = constraintAnnotation;
 	}
 
+	@SuppressWarnings("checkstyle:RegexpSingleline")
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
 		if (value == null || value.isBlank()) {
 			return true; // 빈 문자열도 허용하려면 이렇게
 		}
+
 		Object[] enumValues = this.annotation.target().getEnumConstants();
 		if (enumValues != null) {
 			for (Object enumValue : enumValues) {

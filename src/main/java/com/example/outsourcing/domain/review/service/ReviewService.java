@@ -36,6 +36,14 @@ public class ReviewService {
 	private final OrderRepository orderRepository;
 	private final StoreRepository storeRepository;
 
+	/**
+	 * Review 생성
+	 * - 배달 완료된 주문의 주문자만 리뷰를 생성할 수 있다.
+	 * @author 조아현
+	 * @Param userId
+	 * @Param ReviewRequestDto
+	 * @since 2025 04 26
+	 */
 	@Transactional
 	public ReviewSaveResponseDto saveReview(Long userId, @Valid ReviewRequestDto dto) {
 
@@ -43,10 +51,6 @@ public class ReviewService {
 
 		Order order = orderRepository.findById(dto.getOrderId())
 			.orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_ORDER_NOT_FOUND));
-
-		System.out.println("== order ID: " + order.getId());
-		System.out.println("== order user ID: " + order.getUser().getId());
-		System.out.println("== order status: " + order.getOrderStatus());
 
 		if (!order.getUser().getId().equals(userId)) {
 			throw new ReviewException(ReviewErrorCode.REVIEW_USER_NOT_CUSTOMER);
@@ -65,6 +69,17 @@ public class ReviewService {
 
 	}
 
+	/**
+	 * Review 목록 조회
+	 * - 가게의 리뷰 목록을 조회할 수 있다.
+	 * @author 조아현
+	 * @Param userId
+	 * @Param storeId
+	 * @Param startRating
+	 * @Param endRating
+	 * @Param StoreReviewsResponsedDto
+	 * @since 2025 04 26
+	 */
 	@Transactional(readOnly = false)
 	public StoreReviewsResponseDto findReviews(Long userId, Long storeId, Integer startRating, Integer endRating) {
 
@@ -82,13 +97,22 @@ public class ReviewService {
 		List<ReviewResponseDto> responses = reviews.stream().map(review -> {
 			return new ReviewResponseDto(review.getId(), review.getContent(), review.getRating(),
 				review.getUpdatedAt());
-		}).collect(
-			Collectors.toList());
+		}).collect(Collectors.toList());
 
 		return new StoreReviewsResponseDto(storeId, responses);
+
 	}
 
+	/**
+	 * user 검증
+	 * - 사용자의 로그인상태 등을 검증한다.
+	 * @author 조아현
+	 * @Param userId
+	 * @Return User
+	 * @since 2025 04 26
+	 */
 	private User checkUser(Long userId) {
+
 		if (userId == null) {
 			throw new StoreException(ReviewErrorCode.REVIEW_USER_NOT_LOGIN);
 		}
