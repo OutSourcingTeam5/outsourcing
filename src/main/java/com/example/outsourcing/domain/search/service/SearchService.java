@@ -83,7 +83,7 @@ public class SearchService {
 	 * 입력된 검색값이 카테고리 value에 포함되는지 확인하는 메서드
 	 * @author 조아현
 	 * @since 2025 04 27
-	 * @param   keyword
+	 * @param  keyword
 	 * @return String
 	 */
 	private String checkKeywordCategory(String keyword) {

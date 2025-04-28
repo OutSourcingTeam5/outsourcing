@@ -97,8 +97,7 @@ public class ReviewService {
 		List<ReviewResponseDto> responses = reviews.stream().map(review -> {
 			return new ReviewResponseDto(review.getId(), review.getContent(), review.getRating(),
 				review.getUpdatedAt());
-		}).collect(
-			Collectors.toList());
+		}).collect(Collectors.toList());
 
 		return new StoreReviewsResponseDto(storeId, responses);
 
