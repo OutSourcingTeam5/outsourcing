@@ -13,6 +13,7 @@ import com.example.outsourcing.domain.store.repository.StoreRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class MenuService {
 	/**
 	 * 삭제된 메뉴는 수정이 불가능하며 사용자가 가게의 오너일 경우에만 수정가능.
 	 */
-
+	@Transactional
 	public MenuResultResponse update(Long menuId, MenuUpdateRequest request, Long currentUserId) {
 		Menu menu = menuRepository.findById(menuId)
 				.orElseThrow(() -> new CustomException(MenuErrorCode.MENU_NOT_FOUND));
@@ -71,6 +72,7 @@ public class MenuService {
 	/**
 	 * 삭제된 메뉴는 중복삭제가 불가능하며 사용자가 가게의 오너일 경우에만 삭제가능.(soft delete)
 	 */
+	@Transactional
 	public MenuResultResponse delete(Long menuId, Long currentUserId) {
 		Menu menu = menuRepository.findById(menuId)
 				.orElseThrow(() -> new CustomException(MenuErrorCode.MENU_NOT_FOUND));

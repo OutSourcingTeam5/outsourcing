@@ -2,11 +2,13 @@ package com.example.outsourcing.domain.menu.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class MenuUpdateRequest {
 
 	@NotBlank(message = "메뉴 이름은 필수입니다.")
